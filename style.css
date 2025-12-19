@@ -558,7 +558,6 @@ input[type="password"]:focus {
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   padding: 48px 40px !important;
-  max-width: 480px;
   margin: 0 auto;
 }
 
@@ -655,8 +654,7 @@ input[type="password"]:focus {
   .auth-container {
     padding: 32px 24px !important;
     max-width: 100% !important;
-    width: calc(100% - 24px);
-    margin: 0 12px !important;
+ width: 100%;    margin: 0 12px !important;
     border-radius: 16px !important;
   }
 
@@ -696,8 +694,7 @@ input[type="password"]:focus {
 
   .auth-container {
     padding: 24px 16px !important;
-    width: calc(100% - 16px);
-    margin: 0 8px !important;
+ width: 100%;    margin: 0 8px !important;
     border-radius: 12px !important;
   }
 
@@ -724,5 +721,6 @@ input[type="password"]:focus {
     font-size: 14px !important;
   }
 }
+
 
 
