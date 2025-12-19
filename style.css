@@ -10,12 +10,12 @@ body {
 }
 
 #app {
-  min-height: 100vh;
+  min-height: var(--tg-viewport-stable-height, 100vh);
   box-sizing: border-box;
   padding:
-    calc(var(--tg-viewport-safe-area-top, 0px) + 12px)
-    12px
-    calc(var(--tg-viewport-safe-area-bottom, 0px) + 12px);
+    calc(var(--tg-viewport-safe-area-top, 0px) + 20px)
+    16px
+    calc(var(--tg-viewport-safe-area-bottom, 0px) + 20px);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -163,3 +163,4 @@ body {
   display: flex;
   gap: 8px;
 }
+
