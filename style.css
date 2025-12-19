@@ -1,41 +1,49 @@
 :root {
   color-scheme: dark light;
+  /* Вычисляем safe-area снизу если Telegram не даёт */
+  --safe-area-inset-bottom: calc(var(--tg-viewport-stable-height, 100vh) - 100vh);
 }
 
-body {
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+}
+
+html, body {
   margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: var(--tg-theme-bg-color, #0f0f10);
   color: var(--tg-theme-text-color, #ffffff);
-  /* Важно: запретить скроллинг body */
   overflow: hidden;
+  position: fixed;
 }
 
 #app {
-  /* Используем viewport-relative height, не 100vh */
-  height: 100vh;
-  height: 100dvh; /* dynamic viewport height для мобильных */
+  width: 100%;
+  height: 100%;
   box-sizing: border-box;
   
-  /* Учитываем device safe area (не content safe area) */
-  padding-top: var(--tg-viewport-safe-area-top, 12px);
-  padding-bottom: var(--tg-viewport-safe-area-bottom, 12px);
+  /* Используем Telegram-переменные для отступов */
+  padding-top: max(12px, var(--tg-viewport-safe-area-top, 12px));
+  padding-bottom: max(12px, var(--tg-viewport-safe-area-bottom, 12px));
   padding-left: 12px;
   padding-right: 12px;
   
   display: flex;
   flex-direction: column;
   gap: 12px;
-  
-  /* Главное: не даём переполняться, скроллим только историю */
   overflow: hidden;
 }
 
 .app-header h1 {
   margin: 0;
-  font-size: 20px;
+  font-size: 22px;
   text-align: center;
   flex-shrink: 0;
+  padding: 0;
 }
 
 .balances {
@@ -43,40 +51,51 @@ body {
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   flex-shrink: 0;
+  width: 100%;
 }
 
 .balance-card {
   background: var(--tg-theme-secondary-bg-color, #1f1f22);
   border-radius: 16px;
-  padding: 8px;
+  padding: 10px 8px;
   text-align: center;
   cursor: pointer;
+  min-width: 0; /* важно для обрезания текста */
 }
 
 .balance-title {
   font-size: 12px;
   opacity: 0.8;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .balance-amount {
   display: block;
-  margin-top: 4px;
+  margin-top: 6px;
   font-size: 16px;
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .total {
   background: var(--tg-theme-secondary-bg-color, #1f1f22);
   border-radius: 16px;
-  padding: 10px 12px;
+  padding: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .total-label {
   opacity: 0.8;
+  font-size: 14px;
 }
 
 .total-amount {
@@ -88,17 +107,20 @@ body {
   display: flex;
   gap: 8px;
   flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .primary-btn,
 .secondary-btn {
   flex: 1;
-  height: 44px;
+  height: 48px;
   border-radius: 999px;
   border: none;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 500;
   cursor: pointer;
+  transition: opacity 0.2s;
 }
 
 .primary-btn {
@@ -106,21 +128,30 @@ body {
   color: var(--tg-theme-button-text-color, #ffffff);
 }
 
+.primary-btn:active {
+  opacity: 0.8;
+}
+
 .secondary-btn {
   background: var(--tg-theme-secondary-bg-color, #1f1f22);
   color: var(--tg-theme-text-color, #ffffff);
 }
 
-/* История: ТОЛЬКО ОНА СКРОЛЛИТСЯ */
+.secondary-btn:active {
+  opacity: 0.8;
+}
+
 .history {
   flex: 1;
-  min-height: 0; /* важно для flex-контейнера, чтобы дал скролл */
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .history h2 {
-  margin: 8px 0;
+  margin: 8px 0 12px;
   font-size: 16px;
   flex-shrink: 0;
 }
@@ -132,20 +163,35 @@ body {
 }
 
 #history-list li {
-  padding: 6px 0;
+  padding: 8px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   font-size: 13px;
+  word-break: break-word;
 }
 
 /* Модалка */
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   z-index: 1000;
+  padding: 16px;
+  box-sizing: border-box;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .modal.hidden {
@@ -153,36 +199,55 @@ body {
 }
 
 .modal-content {
-  width: 90%;
+  width: 100%;
   max-width: 360px;
   background: var(--tg-theme-secondary-bg-color, #1f1f22);
-  border-radius: 20px;
-  padding: 16px;
+  border-radius: 24px 24px 0 0;
+  padding: 24px 16px;
   box-sizing: border-box;
-  max-height: 80vh;
-  overflow-y: auto;
+  animation: slideUp 0.3s ease-out;
 }
 
 .modal-content h3 {
-  margin-top: 0;
-  margin-bottom: 12px;
-  font-size: 16px;
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .modal-content input {
   width: 100%;
   box-sizing: border-box;
-  height: 40px;
-  border-radius: 10px;
+  height: 48px;
+  border-radius: 12px;
   border: none;
-  padding: 0 10px;
+  padding: 0 14px;
   font-size: 16px;
   background: var(--tg-theme-bg-color, #0f0f10);
   color: var(--tg-theme-text-color, #ffffff);
+  margin-bottom: 16px;
+}
+
+.modal-content input:focus {
+  outline: 2px solid var(--tg-theme-button-color, #2ea6ff);
+  outline-offset: -2px;
 }
 
 .modal-actions {
-  margin-top: 12px;
   display: flex;
   gap: 8px;
+  margin-top: 0;
+}
+
+/* Скроллбар для истории */
+.history::-webkit-scrollbar {
+  width: 6px;
+}
+
+.history::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.history::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
 }
