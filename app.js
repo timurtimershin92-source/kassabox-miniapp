@@ -157,14 +157,17 @@ document.getElementById('transfer-modal').classList.remove('hidden');
 
 const confirmTransferBtn = document.getElementById('confirm-transfer-btn');
 confirmTransferBtn.addEventListener('click', async () => {
-    const transferType = document.getElementById('transfer-from').value;
-    const amount = parseFloat(document.getElementById('transfer-amount').value);
+    const transferType = document.getElementById('transfer-from').value;from line 167
+    const mapping = { safe1: { from: 'safe1', to: 'safe2' }, card: { from: 'card', to: 'safe1' } };
+    const { from, to } = mapping[transferType] || {};
+    if (!from || !to) return tg.showAlert('Невалидный тип трансфера');
+    body: JSON.stringify({ from_type: from, to_type: toconst amount = parseFloat(document.getElementById('transfer-amount').value);
     if (!amount || amount <= 0) return tg.showAlert('Сумма должна быть больше 0');
     try {
           const res = await fetch(`${API_URL}/api/wallet/${currentWalletId}/transfer`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json', 'X-Init-Data': currentInitData },
-                  body: JSON.stringify({ type: transferType, amount })
+                        body: JSON.stringify({ from_type: 'card', to_type: 'safe1', amount }) // TODO: map transfer types properly
                 });
           if (res.ok) {
                   document.getElementById('transfer-modal').classList.add('hidden');
@@ -186,4 +189,5 @@ if (savedWalletId) {
   currentWalletId = savedWalletId;
   showMainScreen();
 }
+
 
