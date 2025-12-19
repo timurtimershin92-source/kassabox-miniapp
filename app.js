@@ -24,6 +24,11 @@ function autoFillTelegramUsername() {
       const usernameInput = document.getElementById('login-username');
       if (usernameInput) {
         usernameInput.value = telegramUser.username;
+              // Also fill registration username if the form is visible
+      const regUsernameInput = document.getElementById('register-username');
+      if (regUsernameInput) {
+        regUsernameInput.value = telegramUser.username;
+      }
       }
     }
   } catch (error) {
@@ -327,6 +332,7 @@ if (registerForm) {
     document.getElementById('auth-screen').classList.add('hidden');
   });
 }
+
 
 
 
