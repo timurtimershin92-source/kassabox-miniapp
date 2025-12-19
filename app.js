@@ -1,102 +1,137 @@
 const tg = window.Telegram.WebApp;
-
-// Сразу готовимся и расширяем
 tg.ready();
+tg.expand();
 
-// Расширяем немедленно, до любого другого кода
-if (!tg.isExpanded) {
-  tg.expand();
-}
+const API_URL = 'https://kassabox-bot.onrender.com';
+let currentWalletId = null;
+let currentInitData = tg.initData;
 
-// Слушаем изменения viewport
-tg.onEvent('viewportChanged', () => {
-  if (!tg.isExpanded) {
-    tg.expand(); // если пользователь минимизировал, снова расширяем
-  }
-});
-
-const balances = {
-  card: 0,
-  safe1: 0,
-  safe2: 0,
+const screens = {
+  walletSelect: document.getElementById('wallet-select-screen'),
+  main: document.getElementById('main-screen')
 };
 
-const BALANCES_KEY = "kassabox_balances_v1";
+// Модальные окна
 
-function loadBalances() {
-  const raw = window.localStorage.getItem(BALANCES_KEY);
-  if (!raw) return;
+const createWalletBtn = document.getElementById('create-wallet-btn');
+const joinWalletBtn = document.getElementById('join-wallet-btn');
+const confirmCreateBtn = document.getElementById('confirm-create-btn');
+const confirmJoinBtn = document.getElementById('confirm-join-btn');
+const menuBtn = document.getElementById('menu-btn');
+const logoutBtn = document.getElementById('logout-btn');
+
+createWalletBtn.addEventListener('click', () => {
+  document.getElementById('create-wallet-modal').classList.remove('hidden');
+});
+
+joinWalletBtn.addEventListener('click', () => {
+  document.getElementById('join-wallet-modal').classList.remove('hidden');
+});
+
+confirmCreateBtn.addEventListener('click', async () => {
+  const name = document.getElementById('wallet-name').value;
+  if (!name) return tg.showAlert('Название обязательно');
   try {
-    const data = JSON.parse(raw);
-    balances.card = Number(data.card) || 0;
-    balances.safe1 = Number(data.safe1) || 0;
-    balances.safe2 = Number(data.safe2) || 0;
-  } catch {
-    // ignore
+    const res = await fetch(`${API_URL}/api/wallet/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, initData: currentInitData })
+    });
+    const data = await res.json();
+    if (data.wallet_id) {
+      currentWalletId = data.wallet_id;
+      localStorage.setItem('walletId', data.wallet_id);
+      showMainScreen();
+    }
+  } catch (e) {
+    tg.showAlert('Ошибка: ' + e.message);
+  }
+});
+
+confirmJoinBtn.addEventListener('click', async () => {
+  const walletId = document.getElementById('wallet-id-input').value;
+  if (!walletId || walletId.length !== 8) return tg.showAlert('Код должен быть 8 символов');
+  try {
+    const res = await fetch(`${API_URL}/api/wallet/join`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ wallet_id: walletId, initData: currentInitData })
+    });
+    if (res.ok) {
+      currentWalletId = walletId;
+      localStorage.setItem('walletId', walletId);
+      showMainScreen();
+    } else {
+      tg.showAlert('Неверный код');
+    }
+  } catch (e) {
+    tg.showAlert('Ошибка: ' + e.message);
+  }
+});
+
+menuBtn.addEventListener('click', () => {
+  document.getElementById('menu-modal').classList.remove('hidden');
+});
+
+logoutBtn.addEventListener('click', () => {
+  currentWalletId = null;
+  localStorage.removeItem('walletId');
+  screens.walletSelect.classList.remove('hidden');
+  screens.main.classList.add('hidden');
+  document.getElementById('menu-modal').classList.add('hidden');
+});
+
+function showMainScreen() {
+  screens.walletSelect.classList.add('hidden');
+  screens.main.classList.remove('hidden');
+  document.getElementById('create-wallet-modal').classList.add('hidden');
+  document.getElementById('join-wallet-modal').classList.add('hidden');
+  loadBalancesAndHistory();
+}
+
+async function loadBalancesAndHistory() {
+  try {
+    const res = await fetch(`${API_URL}/api/wallet/${currentWalletId}/balances`, {
+      headers: { 'X-Init-Data': currentInitData }
+    });
+    const data = await res.json();
+    document.getElementById('balance-card').textContent = data.card.toFixed(2);
+    document.getElementById('balance-safe1').textContent = data.safe1.toFixed(2);
+    document.getElementById('balance-safe2').textContent = data.safe2.toFixed(2);
+    document.getElementById('total-balance').textContent = data.total.toFixed(2);
+  } catch (e) {
+    console.error(e);
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/api/wallet/${currentWalletId}/operations?limit=20`, {
+      headers: { 'X-Init-Data': currentInitData }
+    });
+    const data = await res.json();
+    const historyList = document.getElementById('history-list');
+    historyList.innerHTML = '';
+    data.operations.forEach(op => {
+      const div = document.createElement('div');
+      div.className = 'history-item';
+      div.innerHTML = `<small>${op.date.substring(0, 10)} ${op.type === 'expense' ? '💴' : '🖄'} ${op.amount.toFixed(2)} ${op.comment}</small>`;
+      historyList.appendChild(div);
+    });
+  } catch (e) {
+    console.error(e);
   }
 }
 
-function saveBalances() {
-  window.localStorage.setItem(BALANCES_KEY, JSON.stringify(balances));
-}
-
-function renderBalances() {
-  document.getElementById("balance-card").textContent = balances.card.toFixed(2);
-  document.getElementById("balance-safe1").textContent = balances.safe1.toFixed(2);
-  document.getElementById("balance-safe2").textContent = balances.safe2.toFixed(2);
-  const total = balances.card + balances.safe1 + balances.safe2;
-  document.getElementById("total-balance").textContent = total.toFixed(2);
-}
-
-const modal = document.getElementById("edit-modal");
-const editInput = document.getElementById("edit-input");
-const editTitle = document.getElementById("edit-title");
-
-let currentAccount = null;
-
-function openEditModal(accountKey, title) {
-  currentAccount = accountKey;
-  editTitle.textContent = `Редактировать: ${title}`;
-  editInput.value = balances[accountKey].toString();
-  modal.classList.remove("hidden");
-  setTimeout(() => editInput.focus(), 100); // задержка для iOS
-}
-
-function closeEditModal() {
-  modal.classList.add("hidden");
-  currentAccount = null;
-}
-
-document.getElementById("edit-cancel").addEventListener("click", closeEditModal);
-document.getElementById("edit-save").addEventListener("click", () => {
-  if (!currentAccount) return;
-  const value = parseFloat(editInput.value.replace(",", "."));
-  if (Number.isNaN(value)) {
-    tg.showAlert("Введите корректное число");
-    return;
-  }
-  balances[currentAccount] = value;
-  saveBalances();
-  renderBalances();
-  closeEditModal();
+document.getElementById('expense-btn').addEventListener('click', () => {
+  tg.showAlert('Форма расхода в разработке');
 });
 
-document.querySelectorAll(".balance-card").forEach((card) => {
-  card.addEventListener("click", () => {
-    const account = card.dataset.account;
-    const title = card.querySelector(".balance-title").textContent;
-    openEditModal(account, title);
-  });
+document.getElementById('transfer-btn').addEventListener('click', () => {
+  tg.showAlert('Форма инкассации в разработке');
 });
 
-document.getElementById("expense-btn").addEventListener("click", () => {
-  tg.showAlert("Форма расхода ещё в разработке");
-});
-
-document.getElementById("transfer-btn").addEventListener("click", () => {
-  tg.showAlert("Форма инкассации ещё в разработке");
-});
-
-// Инициализация
-loadBalances();
-renderBalances();
+// Проверка сохранённого кошелька
+const savedWalletId = localStorage.getItem('walletId');
+if (savedWalletId) {
+  currentWalletId = savedWalletId;
+  showMainScreen();
+}
