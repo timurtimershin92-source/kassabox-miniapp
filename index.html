@@ -91,6 +91,54 @@
           <h2>Меню</h2>
           <button id="logout-btn" class="secondary-btn full-width">Выйти из кошелька</button>
         </div>
+            <!-- Модальное окно расхода -->
+    <div id="expense-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Расход</h2>
+        <div>
+          <label>Счёт:</label>
+          <select id="expense-source">
+            <option value="card">💳 Карта</option>
+            <option value="safe1">🔒 Касса</option>
+            <option value="safe2">🔐 Сейф 2</option>
+          </select>
+        </div>
+        <div>
+          <label>Сумма:</label>
+          <input id="expense-amount" type="number" placeholder="0.00" step="0.01" min="0" />
+        </div>
+        <div>
+          <label>Комментарий:</label>
+          <input id="expense-comment" type="text" placeholder="Описание" maxlength="50" />
+        </div>
+        <div class="modal-actions">
+          <button class="secondary-btn" onclick="document.getElementById('expense-modal').classList.add('hidden')">Отмена</button>
+          <button id="confirm-expense-btn" class="primary-btn">Записать</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модальное окно инкассации -->
+    <div id="transfer-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Инкассация</h2>
+        <div>
+          <label>Из:</label>
+          <select id="transfer-from">
+            <option value="safe1">🔒 Касса → 🔐 Сейф 2</option>
+            <option value="card">💳 Карта → 🔒 Касса</option>
+          </select>
+        </div>
+        <div>
+          <label>Сумма:</label>
+          <input id="transfer-amount" type="number" placeholder="0.00" step="0.01" min="0" />
+        </div>
+        <div class="modal-actions">
+          <button class="secondary-btn" onclick="document.getElementById('transfer-modal').classList.add('hidden')">Отмена</button>
+          <button id="confirm-transfer-btn" class="primary-btn">Инкассировать</button>
+        </div>
+      </div>
+    </div>
       </div>
     </div>
   </div>
@@ -98,3 +146,4 @@
   <script src="app.js"></script>
 </body>
 </html>
+
