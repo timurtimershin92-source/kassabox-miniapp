@@ -9,8 +9,37 @@
 </head>
 <body>
   <div id="app">
-    <!-- Экран входа/создания кошелька -->
-    <div id="wallet-select-screen" class="screen">
+    <!-- Экран логина/регистрации -->
+    <div id="auth-screen" class="screen auth-screen">
+      <div class="auth-container">
+        <h1>Kassabox</h1>
+        <p class="auth-subtitle">Управляй своим кошельком</p>
+        
+        <!-- Вкладки логина/регистрации -->
+        <div class="auth-tabs">
+          <button id="login-tab-btn" class="auth-tab-btn active">Вход</button>
+          <button id="register-tab-btn" class="auth-tab-btn">Регистрация</button>
+        </div>
+        
+        <!-- Форма логина -->
+        <div id="login-form" class="auth-form">
+          <input id="login-username" type="text" placeholder="Имя пользователя" maxlength="20" />
+          <input id="login-password" type="password" placeholder="Пароль" />
+          <button id="login-btn" class="primary-btn">Войти</button>
+        </div>
+        
+        <!-- Форма регистрации -->
+        <div id="register-form" class="auth-form hidden">
+          <input id="register-username" type="text" placeholder="Имя пользователя" maxlength="20" />
+          <input id="register-password" type="password" placeholder="Пароль" />
+          <input id="register-password-confirm" type="password" placeholder="Подтверждение пароля" />
+          <button id="register-btn" class="primary-btn">Зарегистрироваться</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Экран выбора кошелька -->
+    <div id="wallet-select-screen" class="screen hidden">
       <div class="wallet-intro">
         <h1>Kassabox</h1>
         <p>Управляй своим кошельком</p>
@@ -20,7 +49,7 @@
         <button id="join-wallet-btn" class="secondary-btn">Войти в кошелёк</button>
       </div>
     </div>
-
+    
     <!-- Модальное окно создания кошелька -->
     <div id="create-wallet-modal" class="modal hidden">
       <div class="modal-content">
@@ -32,7 +61,7 @@
         </div>
       </div>
     </div>
-
+    
     <!-- Модальное окно входа в кошелёк -->
     <div id="join-wallet-modal" class="modal hidden">
       <div class="modal-content">
@@ -44,7 +73,7 @@
         </div>
       </div>
     </div>
-
+    
     <!-- Основной экран приложения -->
     <div id="main-screen" class="screen hidden">
       <header class="app-header">
@@ -54,7 +83,6 @@
         </div>
         <button id="menu-btn" class="menu-btn">⚙️</button>
       </header>
-
       <section class="balances">
         <div class="balance-card">
           <span class="balance-title">💳 Карта</span>
@@ -69,81 +97,75 @@
           <span class="balance-amount" id="balance-safe2">0</span>
         </div>
       </section>
-
       <section class="total">
         <span class="total-label">Общий баланс</span>
         <span class="total-amount" id="total-balance">0</span>
       </section>
-
       <section class="actions">
         <button id="expense-btn" class="primary-btn">Расход</button>
         <button id="transfer-btn" class="secondary-btn">Инкассация</button>
       </section>
-
       <section class="history">
         <h2>История операций</h2>
         <div id="history-list"></div>
       </section>
-
       <!-- Меню -->
       <div id="menu-modal" class="modal hidden">
         <div class="modal-content menu-modal">
           <h2>Меню</h2>
-          <button id="logout-btn" class="secondary-btn full-width">Выйти из кошелька</button>
-        </div>
-            <!-- Модальное окно расхода -->
-    <div id="expense-modal" class="modal hidden">
-      <div class="modal-content">
-        <h2>Расход</h2>
-        <div>
-          <label>Счёт:</label>
-          <select id="expense-source">
-            <option value="card">💳 Карта</option>
-            <option value="safe1">🔒 Касса</option>
-            <option value="safe2">🔐 Сейф 2</option>
-          </select>
-        </div>
-        <div>
-          <label>Сумма:</label>
-          <input id="expense-amount" type="number" placeholder="0.00" step="0.01" min="0" />
-        </div>
-        <div>
-          <label>Комментарий:</label>
-          <input id="expense-comment" type="text" placeholder="Описание" maxlength="50" />
-        </div>
-        <div class="modal-actions">
-          <button class="secondary-btn" onclick="document.getElementById('expense-modal').classList.add('hidden')">Отмена</button>
-          <button id="confirm-expense-btn" class="primary-btn">Записать</button>
+          <button id="logout-btn" class="secondary-btn full-width">Выйти из аккаунта</button>
         </div>
       </div>
-    </div>
-
-    <!-- Модальное окно инкассации -->
-    <div id="transfer-modal" class="modal hidden">
-      <div class="modal-content">
-        <h2>Инкассация</h2>
-        <div>
-          <label>Из:</label>
-          <select id="transfer-from">
-            <option value="safe1">🔒 Касса → 🔐 Сейф 2</option>
-            <option value="card">💳 Карта → 🔒 Касса</option>
-          </select>
-        </div>
-        <div>
-          <label>Сумма:</label>
-          <input id="transfer-amount" type="number" placeholder="0.00" step="0.01" min="0" />
-        </div>
-        <div class="modal-actions">
-          <button class="secondary-btn" onclick="document.getElementById('transfer-modal').classList.add('hidden')">Отмена</button>
-          <button id="confirm-transfer-btn" class="primary-btn">Инкассировать</button>
+      <!-- Модальное окно расхода -->
+      <div id="expense-modal" class="modal hidden">
+        <div class="modal-content">
+          <h2>Расход</h2>
+          <div>
+            <label>Счёт:</label>
+            <select id="expense-source">
+              <option value="card">💳 Карта</option>
+              <option value="safe1">🔒 Касса</option>
+              <option value="safe2">🔐 Сейф 2</option>
+            </select>
+          </div>
+          <div>
+            <label>Сумма:</label>
+            <input id="expense-amount" type="number" placeholder="0.00" step="0.01" min="0" />
+          </div>
+          <div>
+            <label>Комментарий:</label>
+            <input id="expense-comment" type="text" placeholder="Описание" maxlength="50" />
+          </div>
+          <div class="modal-actions">
+            <button class="secondary-btn" onclick="document.getElementById('expense-modal').classList.add('hidden')">Отмена</button>
+            <button id="confirm-expense-btn" class="primary-btn">Записать</button>
+          </div>
         </div>
       </div>
-    </div>
+      <!-- Модальное окно инкассации -->
+      <div id="transfer-modal" class="modal hidden">
+        <div class="modal-content">
+          <h2>Инкассация</h2>
+          <div>
+            <label>Из:</label>
+            <select id="transfer-from">
+              <option value="safe1">🔒 Касса → 🔐 Сейф 2</option>
+              <option value="card">💳 Карта → 🔒 Касса</option>
+            </select>
+          </div>
+          <div>
+            <label>Сумма:</label>
+            <input id="transfer-amount" type="number" placeholder="0.00" step="0.01" min="0" />
+          </div>
+          <div class="modal-actions">
+            <button class="secondary-btn" onclick="document.getElementById('transfer-modal').classList.add('hidden')">Отмена</button>
+            <button id="confirm-transfer-btn" class="primary-btn">Инкассировать</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-
+  
   <script src="app.js"></script>
 </body>
 </html>
-
