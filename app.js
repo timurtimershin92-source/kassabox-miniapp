@@ -5,27 +5,28 @@ tg.expand();
 const API_URL = 'https://kassabox-bot.onrender.com';
 let currentWalletId = null;
 let currentInitData = tg.initData;
+let walletName = '';
 
 const screens = {
   walletSelect: document.getElementById('wallet-select-screen'),
   main: document.getElementById('main-screen')
 };
 
-// Модальные окна
-
+// Button references
 const createWalletBtn = document.getElementById('create-wallet-btn');
 const joinWalletBtn = document.getElementById('join-wallet-btn');
 const confirmCreateBtn = document.getElementById('confirm-create-btn');
 const confirmJoinBtn = document.getElementById('confirm-join-btn');
 const menuBtn = document.getElementById('menu-btn');
 const logoutBtn = document.getElementById('logout-btn');
+const expenseBtn = document.getElementById('expense-btn');
+const transferBtn = document.getElementById('transfer-btn');
+const confirmExpenseBtn = document.getElementById('confirm-expense-btn');
+const confirmTransferBtn = document.getElementById('confirm-transfer-btn');
 
+// Wallet creation
 createWalletBtn.addEventListener('click', () => {
   document.getElementById('create-wallet-modal').classList.remove('hidden');
-});
-
-joinWalletBtn.addEventListener('click', () => {
-  document.getElementById('join-wallet-modal').classList.remove('hidden');
 });
 
 confirmCreateBtn.addEventListener('click', async () => {
@@ -40,12 +41,19 @@ confirmCreateBtn.addEventListener('click', async () => {
     const data = await res.json();
     if (data.wallet_id) {
       currentWalletId = data.wallet_id;
+      walletName = name;
       localStorage.setItem('walletId', data.wallet_id);
+      localStorage.setItem('walletName', name);
       showMainScreen();
     }
   } catch (e) {
     tg.showAlert('Ошибка: ' + e.message);
   }
+});
+
+// Wallet joining
+joinWalletBtn.addEventListener('click', () => {
+  document.getElementById('join-wallet-modal').classList.remove('hidden');
 });
 
 confirmJoinBtn.addEventListener('click', async () => {
@@ -59,7 +67,9 @@ confirmJoinBtn.addEventListener('click', async () => {
     });
     if (res.ok) {
       currentWalletId = walletId;
+      walletName = 'Кошелёк';
       localStorage.setItem('walletId', walletId);
+      localStorage.setItem('walletName', walletName);
       showMainScreen();
     } else {
       tg.showAlert('Неверный код');
@@ -69,27 +79,34 @@ confirmJoinBtn.addEventListener('click', async () => {
   }
 });
 
+// Menu
 menuBtn.addEventListener('click', () => {
   document.getElementById('menu-modal').classList.remove('hidden');
 });
 
 logoutBtn.addEventListener('click', () => {
   currentWalletId = null;
+  walletName = '';
   localStorage.removeItem('walletId');
+  localStorage.removeItem('walletName');
   screens.walletSelect.classList.remove('hidden');
   screens.main.classList.add('hidden');
   document.getElementById('menu-modal').classList.add('hidden');
 });
 
+// Show main screen
 function showMainScreen() {
   screens.walletSelect.classList.add('hidden');
   screens.main.classList.remove('hidden');
   document.getElementById('create-wallet-modal').classList.add('hidden');
   document.getElementById('join-wallet-modal').classList.add('hidden');
+  document.getElementById('wallet-name-display').textContent = walletName || 'Кошелёк';
   loadBalancesAndHistory();
 }
 
+// Load balances and history
 async function loadBalancesAndHistory() {
+  // Load balances
   try {
     const res = await fetch(`${API_URL}/api/wallet/${currentWalletId}/balances`, {
       headers: { 'X-Init-Data': currentInitData }
@@ -100,9 +117,10 @@ async function loadBalancesAndHistory() {
     document.getElementById('balance-safe2').textContent = data.safe2.toFixed(2);
     document.getElementById('total-balance').textContent = data.total.toFixed(2);
   } catch (e) {
-    console.error(e);
+    console.error('Error loading balances:', e);
   }
-
+  
+  // Load operations
   try {
     const res = await fetch(`${API_URL}/api/wallet/${currentWalletId}/operations?limit=20`, {
       headers: { 'X-Init-Data': currentInitData }
@@ -113,81 +131,98 @@ async function loadBalancesAndHistory() {
     data.operations.forEach(op => {
       const div = document.createElement('div');
       div.className = 'history-item';
-      div.innerHTML = `<small>${op.date.substring(0, 10)} ${op.type === 'expense' ? '💴' : '🖄'} ${op.amount.toFixed(2)} ${op.comment}</small>`;
+      const icon = op.type === 'expense' ? '💴' : '🔄';
+      div.innerHTML = `<small>${op.date.substring(0, 10)} ${icon} ${op.amount.toFixed(2)} ${op.comment || ''}</small>`;
       historyList.appendChild(div);
     });
   } catch (e) {
-    console.error(e);
+    console.error('Error loading operations:', e);
   }
 }
 
-document.getElementById('expense-btn').addEventListener('click', () => {
-document.getElementById('expense-modal').classList.remove('hidden');
+// Expense transaction
+expenseBtn.addEventListener('click', () => {
+  document.getElementById('expense-modal').classList.remove('hidden');
 });
 
-const confirmExpenseBtn = document.getElementById('confirm-expense-btn');
 confirmExpenseBtn.addEventListener('click', async () => {
-    const source = document.getElementById('expense-source').value;
-    const amount = parseFloat(document.getElementById('expense-amount').value);
-    const comment = document.getElementById('expense-comment').value;
-    if (!amount || amount <= 0) return tg.showAlert('Сумма должна быть больше 0');
-    try {
-          const res = await fetch(`${API_URL}/api/wallet/${currentWalletId}/expense`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', 'X-Init-Data': currentInitData },
-                  body: JSON.stringify({ source, amount, comment })
-                        });
-          if (res.ok) {
-                  document.getElementById('expense-modal').classList.add('hidden');
-                  document.getElementById('expense-amount').value = '';
-                  document.getElementById('expense-comment').value = '';
-                  loadBalancesAndHistory();
-                  tg.showAlert('Расход добавлен');
-                } else {
-                  tg.showAlert('Недостаточно средств');
-                }
-        } catch (e) {
-          tg.showAlert('Ошибка: ' + e.message);
-        }
-  });
+  const source = document.getElementById('expense-source').value;
+  const amount = parseFloat(document.getElementById('expense-amount').value);
+  const comment = document.getElementById('expense-comment').value;
+  
+  if (!amount || amount <= 0) return tg.showAlert('Сумма должна быть больше 0');
+  
+  try {
+    const res = await fetch(`${API_URL}/api/wallet/${currentWalletId}/expense`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Init-Data': currentInitData },
+      body: JSON.stringify({ account_type: source, amount, comment })
+    });
+    if (res.ok) {
+      document.getElementById('expense-modal').classList.add('hidden');
+      document.getElementById('expense-amount').value = '';
+      document.getElementById('expense-comment').value = '';
+      loadBalancesAndHistory();
+      tg.showAlert('Расход добавлен');
+    } else {
+      tg.showAlert('Недостаточно средств');
+    }
+  } catch (e) {
+    tg.showAlert('Ошибка: ' + e.message);
+  }
+});
 
-document.getElementById('transfer-btn').addEventListener('click', () => {
-document.getElementById('transfer-modal').classList.remove('hidden');
-  });
+// Transfer (Incassation)
+transferBtn.addEventListener('click', () => {
+  document.getElementById('transfer-modal').classList.remove('hidden');
+});
 
-const confirmTransferBtn = document.getElementById('confirm-transfer-btn');
 confirmTransferBtn.addEventListener('click', async () => {
-    const transferType = document.getElementById('transfer-from').value;from line 167
-    const mapping = { safe1: { from: 'safe1', to: 'safe2' }, card: { from: 'card', to: 'safe1' } };
-    const { from, to } = mapping[transferType] || {};
-    if (!from || !to) return tg.showAlert('Невалидный тип трансфера');
-    body: JSON.stringify({ from_type: from, to_type: toconst amount = parseFloat(document.getElementById('transfer-amount').value);
-    if (!amount || amount <= 0) return tg.showAlert('Сумма должна быть больше 0');
-    try {
-          const res = await fetch(`${API_URL}/api/wallet/${currentWalletId}/transfer`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', 'X-Init-Data': currentInitData },
-                        body: JSON.stringify({ from_type: 'card', to_type: 'safe1', amount }) // TODO: map transfer types properly
-                });
-          if (res.ok) {
-                  document.getElementById('transfer-modal').classList.add('hidden');
-                  document.getElementById('transfer-amount').value = '';
-                  loadBalancesAndHistory();
-                  tg.showAlert('Инкассация выполнена');
-                } else {
-                  tg.showAlert('Недостаточно средств');
-                }
-                      } catch (e) {
-          tg.showAlert('Ошибка: ' + e.message);
-        }
+  const transferType = document.getElementById('transfer-from').value;
+  const amount = parseFloat(document.getElementById('transfer-amount').value);
+  
+  if (!amount || amount <= 0) return tg.showAlert('Сумма должна быть больше 0');
+  
+  // Map transfer types
+  const mapping = {
+    'safe1': { from: 'safe1', to: 'safe2' },
+    'card': { from: 'card', to: 'safe1' }
+  };
+  
+  const transfer = mapping[transferType];
+  if (!transfer) return tg.showAlert('Неверный тип трансфера');
+  
+  try {
+    const res = await fetch(`${API_URL}/api/wallet/${currentWalletId}/transfer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Init-Data': currentInitData },
+      body: JSON.stringify({ from_type: transfer.from, to_type: transfer.to, amount, comment: '' })
+    });
+    if (res.ok) {
+      document.getElementById('transfer-modal').classList.add('hidden');
+      document.getElementById('transfer-amount').value = '';
+      loadBalancesAndHistory();
+      tg.showAlert('Инкассация выполнена');
+    } else {
+      tg.showAlert('Недостаточно средств');
+    }
+  } catch (e) {
+    tg.showAlert('Ошибка: ' + e.message);
+  }
+});
+
+// Close modals
+document.querySelectorAll('.modal').forEach(modal => {
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.classList.add('hidden');
   });
 });
 
-// Проверка сохранённого кошелька
+// Check saved wallet on load
 const savedWalletId = localStorage.getItem('walletId');
+const savedWalletName = localStorage.getItem('walletName');
 if (savedWalletId) {
   currentWalletId = savedWalletId;
+  walletName = savedWalletName || 'Кошелёк';
   showMainScreen();
 }
-
-
