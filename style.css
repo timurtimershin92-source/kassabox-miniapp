@@ -1,5 +1,7 @@
 :root {
   color-scheme: dark light;
+  --safe-area-top-fallback: 20px;
+  --safe-area-bottom-fallback: 20px;
 }
 
 body {
@@ -163,4 +165,5 @@ body {
   display: flex;
   gap: 8px;
 }
+
 
