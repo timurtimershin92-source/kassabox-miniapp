@@ -336,3 +336,51 @@ if (registerForm) {
 
 
 
+
+
+
+// ===== FIX: ADD BUTTON CLICK HANDLERS =====
+const loginBtn = document.getElementById('login-btn');
+const registerBtn = document.getElementById('register-btn');
+
+if (loginBtn) {
+  loginBtn.addEventListener('click', () => {
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    
+    if (!username || !password) {
+      alert('Пожалуйста заполните все поля');
+      return;
+    }
+    
+    // TODO: Add login logic with backend
+    console.log('Login attempt:', { username, password });
+    // For now, just show wallet selection
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('wallet-select-screen').classList.remove('hidden');
+  });
+}
+
+if (registerBtn) {
+  registerBtn.addEventListener('click', () => {
+    const username = document.getElementById('register-username').value;
+    const password = document.getElementById('register-password').value;
+    const passwordConfirm = document.getElementById('register-password-confirm').value;
+    
+    if (!username || !password || !passwordConfirm) {
+      alert('Пожалуйста заполните все поля');
+      return;
+    }
+    
+    if (password !== passwordConfirm) {
+      alert('Пароли не совпадают');
+      return;
+    }
+    
+    // TODO: Add registration logic with backend
+    console.log('Register attempt:', { username, password });
+    // For now, just show wallet selection
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('wallet-select-screen').classList.remove('hidden');
+  });
+}
