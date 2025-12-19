@@ -692,8 +692,7 @@ input[type="password"]:focus {
   }
 
   .auth-container {
- padding: 16px 12px !important; width: 100%;    margin: 0 8px !important;
-    border-radius: 12px !important;
+ padding: 8px 6px !important; width: 100%;  margin: 0 4px !important;    border-radius: 12px !important;
   }
 
   .auth-container h1 {
@@ -719,6 +718,7 @@ input[type="password"]:focus {
     font-size: 14px !important;
   }
 }
+
 
 
 
