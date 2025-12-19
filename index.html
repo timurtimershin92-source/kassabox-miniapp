@@ -9,49 +9,88 @@
 </head>
 <body>
   <div id="app">
-    <header class="app-header">
-      <h1>Kassabox</h1>
-    </header>
-
-    <section class="balances">
-      <div class="balance-card" data-account="card">
-        <span class="balance-title">Карта</span>
-        <span class="balance-amount" id="balance-card">0</span>
+    <!-- Экран входа/создания кошелька -->
+    <div id="wallet-select-screen" class="screen">
+      <div class="wallet-intro">
+        <h1>Kassabox</h1>
+        <p>Управляй своим кошельком</p>
       </div>
-      <div class="balance-card" data-account="safe1">
-        <span class="balance-title">Касса</span>
-        <span class="balance-amount" id="balance-safe1">0</span>
+      <div class="wallet-actions">
+        <button id="create-wallet-btn" class="primary-btn">Создать кошелёк</button>
+        <button id="join-wallet-btn" class="secondary-btn">Войти в кошелёк</button>
       </div>
-      <div class="balance-card" data-account="safe2">
-        <span class="balance-title">Сейф 2</span>
-        <span class="balance-amount" id="balance-safe2">0</span>
+    </div>
+
+    <!-- Модальное окно создания кошелька -->
+    <div id="create-wallet-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Новый кошелёк</h2>
+        <input id="wallet-name" type="text" placeholder="Название кошелька" maxlength="20" />
+        <div class="modal-actions">
+          <button class="secondary-btn" onclick="document.getElementById('create-wallet-modal').classList.add('hidden')">Отмена</button>
+          <button id="confirm-create-btn" class="primary-btn">Создать</button>
+        </div>
       </div>
-    </section>
+    </div>
 
-    <section class="total">
-      <span class="total-label">Общий баланс</span>
-      <span class="total-amount" id="total-balance">0</span>
-    </section>
+    <!-- Модальное окно входа в кошелёк -->
+    <div id="join-wallet-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Код кошелька</h2>
+        <input id="wallet-id-input" type="text" placeholder="Введите код (8 символов)" maxlength="8" />
+        <div class="modal-actions">
+          <button class="secondary-btn" onclick="document.getElementById('join-wallet-modal').classList.add('hidden')">Отмена</button>
+          <button id="confirm-join-btn" class="primary-btn">Войти</button>
+        </div>
+      </div>
+    </div>
 
-    <section class="actions">
-      <button id="expense-btn" class="primary-btn">Расход</button>
-      <button id="transfer-btn" class="secondary-btn">Инкассация</button>
-    </section>
+    <!-- Основной экран приложения -->
+    <div id="main-screen" class="screen hidden">
+      <header class="app-header">
+        <div>
+          <h1>Kassabox</h1>
+          <p id="wallet-name-display"></p>
+        </div>
+        <button id="menu-btn" class="menu-btn">⚙️</button>
+      </header>
 
-    <section class="history">
-      <h2>История</h2>
-      <ul id="history-list"></ul>
-    </section>
-  </div>
+      <section class="balances">
+        <div class="balance-card">
+          <span class="balance-title">💳 Карта</span>
+          <span class="balance-amount" id="balance-card">0</span>
+        </div>
+        <div class="balance-card">
+          <span class="balance-title">🔒 Касса</span>
+          <span class="balance-amount" id="balance-safe1">0</span>
+        </div>
+        <div class="balance-card">
+          <span class="balance-title">🔐 Сейф 2</span>
+          <span class="balance-amount" id="balance-safe2">0</span>
+        </div>
+      </section>
 
-  <!-- Модальное окно редактирования баланса -->
-  <div id="edit-modal" class="modal hidden">
-    <div class="modal-content">
-      <h3 id="edit-title">Редактировать</h3>
-      <input id="edit-input" type="number" inputmode="decimal" maxlength="10" />
-      <div class="modal-actions">
-        <button id="edit-cancel" class="secondary-btn">Отмена</button>
-        <button id="edit-save" class="primary-btn">Сохранить</button>
+      <section class="total">
+        <span class="total-label">Общий баланс</span>
+        <span class="total-amount" id="total-balance">0</span>
+      </section>
+
+      <section class="actions">
+        <button id="expense-btn" class="primary-btn">Расход</button>
+        <button id="transfer-btn" class="secondary-btn">Инкассация</button>
+      </section>
+
+      <section class="history">
+        <h2>История операций</h2>
+        <div id="history-list"></div>
+      </section>
+
+      <!-- Меню -->
+      <div id="menu-modal" class="modal hidden">
+        <div class="modal-content menu-modal">
+          <h2>Меню</h2>
+          <button id="logout-btn" class="secondary-btn full-width">Выйти из кошелька</button>
+        </div>
       </div>
     </div>
   </div>
