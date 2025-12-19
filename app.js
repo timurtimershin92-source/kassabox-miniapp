@@ -13,6 +13,27 @@ const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 
+// Auto-fill Telegram username in login form
+function autoFillTelegramUsername() {
+  try {
+    // Get user data from Telegram WebApp
+    const telegramUser = tg.initDataUnsafe?.user;
+    
+    if (telegramUser && telegramUser.username) {
+      // Get the login username input field
+      const usernameInput = document.getElementById('login-username');
+      if (usernameInput) {
+        usernameInput.value = telegramUser.username;
+      }
+    }
+  } catch (error) {
+    console.error('Error auto-filling username:', error);
+  }
+}
+
+// Call auto-fill when page is ready
+document.addEventListener('DOMContentLoaded', autoFillTelegramUsername);
+
 const API_URL = 'https://kassabox-bot.onrender.com';
 let currentWalletId = null;
 let currentInitData = tg.initData;
@@ -306,5 +327,6 @@ if (registerForm) {
     document.getElementById('auth-screen').classList.add('hidden');
   });
 }
+
 
 
