@@ -1,7 +1,5 @@
 :root {
   color-scheme: dark light;
-  --safe-area-top-fallback: 20px;
-  --safe-area-bottom-fallback: 20px;
 }
 
 body {
@@ -9,30 +7,42 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: var(--tg-theme-bg-color, #0f0f10);
   color: var(--tg-theme-text-color, #ffffff);
+  /* Важно: запретить скроллинг body */
+  overflow: hidden;
 }
 
 #app {
-  min-height: var(--tg-viewport-stable-height, 100vh);
+  /* Используем viewport-relative height, не 100vh */
+  height: 100vh;
+  height: 100dvh; /* dynamic viewport height для мобильных */
   box-sizing: border-box;
-  padding:
-    calc(var(--tg-viewport-safe-area-top, 0px) + 20px)
-    16px
-    calc(var(--tg-viewport-safe-area-bottom, 0px) + 20px);
+  
+  /* Учитываем device safe area (не content safe area) */
+  padding-top: var(--tg-viewport-safe-area-top, 12px);
+  padding-bottom: var(--tg-viewport-safe-area-bottom, 12px);
+  padding-left: 12px;
+  padding-right: 12px;
+  
   display: flex;
   flex-direction: column;
   gap: 12px;
+  
+  /* Главное: не даём переполняться, скроллим только историю */
+  overflow: hidden;
 }
 
 .app-header h1 {
   margin: 0;
   font-size: 20px;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .balances {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .balance-card {
@@ -62,6 +72,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .total-label {
@@ -76,6 +87,7 @@ body {
 .actions {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .primary-btn,
@@ -86,6 +98,7 @@ body {
   border: none;
   font-size: 15px;
   font-weight: 500;
+  cursor: pointer;
 }
 
 .primary-btn {
@@ -98,14 +111,18 @@ body {
   color: var(--tg-theme-text-color, #ffffff);
 }
 
+/* История: ТОЛЬКО ОНА СКРОЛЛИТСЯ */
 .history {
   flex: 1;
-  overflow: auto;
+  min-height: 0; /* важно для flex-контейнера, чтобы дал скролл */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .history h2 {
   margin: 8px 0;
   font-size: 16px;
+  flex-shrink: 0;
 }
 
 #history-list {
@@ -121,7 +138,6 @@ body {
 }
 
 /* Модалка */
-
 .modal {
   position: fixed;
   inset: 0;
@@ -129,6 +145,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1000;
 }
 
 .modal.hidden {
@@ -142,6 +159,8 @@ body {
   border-radius: 20px;
   padding: 16px;
   box-sizing: border-box;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .modal-content h3 {
@@ -158,6 +177,8 @@ body {
   border: none;
   padding: 0 10px;
   font-size: 16px;
+  background: var(--tg-theme-bg-color, #0f0f10);
+  color: var(--tg-theme-text-color, #ffffff);
 }
 
 .modal-actions {
@@ -165,5 +186,3 @@ body {
   display: flex;
   gap: 8px;
 }
-
-
