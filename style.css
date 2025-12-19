@@ -650,3 +650,79 @@ input[type="password"]:focus {
 }
 
 
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .auth-container {
+    padding: 32px 24px !important;
+    max-width: 100% !important;
+    width: calc(100% - 24px);
+    margin: 0 12px !important;
+    border-radius: 16px !important;
+  }
+
+  .auth-container h1 {
+    font-size: 24px !important;
+  }
+
+  .auth-subtitle {
+    font-size: 14px !important;
+    margin: 0 0 20px 0 !important;
+  }
+
+  .auth-form {
+    gap: 12px !important;
+  }
+
+  .auth-form input {
+    padding: 12px 14px !important;
+    font-size: 14px !important;
+  }
+
+  .primary-btn {
+    padding: 12px 14px !important;
+    font-size: 15px !important;
+  }
+
+  .auth-tabs {
+    margin-bottom: 20px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #app {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .auth-container {
+    padding: 24px 16px !important;
+    width: calc(100% - 16px);
+    margin: 0 8px !important;
+    border-radius: 12px !important;
+  }
+
+  .auth-container h1 {
+    font-size: 20px !important;
+  }
+
+  .auth-subtitle {
+    font-size: 13px !important;
+    margin: 0 0 16px 0 !important;
+  }
+
+  .auth-form {
+    gap: 10px !important;
+  }
+
+  .auth-form input {
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+  }
+
+  .primary-btn {
+    padding: 10px 12px !important;
+    font-size: 14px !important;
+  }
+}
+
+
