@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!doctype html>
 <html lang="ru">
 <head>
@@ -10,9 +9,53 @@
 </head>
 <body>
   <div id="app">
-    <h1>Kassabox</h1>
-    <p>Минимальный экран. Сейчас проверяем запуск Mini App.</p>
+    <header class="app-header">
+      <h1>Kassabox</h1>
+    </header>
+
+    <section class="balances">
+      <div class="balance-card" data-account="card">
+        <span class="balance-title">Карта</span>
+        <span class="balance-amount" id="balance-card">0</span>
+      </div>
+      <div class="balance-card" data-account="safe1">
+        <span class="balance-title">Касса</span>
+        <span class="balance-amount" id="balance-safe1">0</span>
+      </div>
+      <div class="balance-card" data-account="safe2">
+        <span class="balance-title">Сейф 2</span>
+        <span class="balance-amount" id="balance-safe2">0</span>
+      </div>
+    </section>
+
+    <section class="total">
+      <span class="total-label">Общий баланс</span>
+      <span class="total-amount" id="total-balance">0</span>
+    </section>
+
+    <section class="actions">
+      <button id="expense-btn" class="primary-btn">Расход</button>
+      <button id="transfer-btn" class="secondary-btn">Инкассация</button>
+    </section>
+
+    <section class="history">
+      <h2>История</h2>
+      <ul id="history-list"></ul>
+    </section>
   </div>
+
+  <!-- Модальное окно редактирования баланса -->
+  <div id="edit-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3 id="edit-title">Редактировать</h3>
+      <input id="edit-input" type="number" inputmode="decimal" maxlength="10" />
+      <div class="modal-actions">
+        <button id="edit-cancel" class="secondary-btn">Отмена</button>
+        <button id="edit-save" class="primary-btn">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
