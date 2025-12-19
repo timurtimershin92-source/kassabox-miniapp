@@ -1,7 +1,14 @@
 :root {
-  color-scheme: dark light;
-  /* Вычисляем safe-area снизу если Telegram не даёт */
-  --safe-area-inset-bottom: calc(var(--tg-viewport-stable-height, 100vh) - 100vh);
+  --primary-color: #0088cc;
+  --secondary-color: #b2b2b2;
+  --success-color: #34c759;
+  --danger-color: #ff3b30;
+  --bg-color: #0a0a0a;
+  --surface-color: #1a1a1a;
+  --text-color: #ffffff;
+  --text-secondary: #a0a0a0;
+  --border-color: #2a2a2a;
+  --safe-area-inset-bottom: 0px;
 }
 
 * {
@@ -15,8 +22,8 @@ html, body {
   width: 100%;
   height: 100%;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: var(--tg-theme-bg-color, #0f0f10);
-  color: var(--tg-theme-text-color, #ffffff);
+  background: var(--bg-color);
+  color: var(--text-color);
   overflow: hidden;
   position: fixed;
 }
@@ -25,256 +32,456 @@ html, body {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-  
-  /* Используем Telegram-переменные для отступов */
-  padding-top: max(12px, var(--tg-viewport-safe-area-top, 12px));
-  padding-bottom: max(12px, var(--tg-viewport-safe-area-bottom, 12px));
+  padding-top: max(12px, var(--safe-area-inset-top, 0px));
+  padding-bottom: max(12px, var(--safe-area-inset-bottom, 0px));
   padding-left: 12px;
   padding-right: 12px;
-  
+}
+
+/* ===== ЭКРАНЫ ===== */
+
+.screen {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.3s ease;
+}
+
+.screen.hidden {
+  display: none;
+}
+
+/* ===== ЭКРАН АУТЕНТИФИКАЦИИ ===== */
+
+.auth-screen {
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-header h1 {
+  margin: 0 0 8px 0;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.auth-subtitle {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.auth-tab-btn {
+  flex: 1;
+  padding: 12px 0;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.auth-tab-btn.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.auth-form {
+  display: none;
+}
+
+.auth-form.active {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.form-group input,
+.form-group select {
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--surface-color);
+  color: var(--text-color);
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.form-group input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* ===== ЭКРАН ВЫБОРА КОШЕЛЬКА ===== */
+
+.wallet-intro {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 40px 20px;
+}
+
+.wallet-intro h1 {
+  margin: 0;
+  font-size: 32px;
+}
+
+.wallet-intro p {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.wallet-actions {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  overflow: hidden;
+  padding-bottom: 20px;
+}
+
+/* ===== ОСНОВНОЙ ЭКРАН ПРИЛОЖЕНИЯ ===== */
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  margin-bottom: 24px;
 }
 
 .app-header h1 {
   margin: 0;
-  font-size: 22px;
-  text-align: center;
-  flex-shrink: 0;
-  padding: 0;
+  font-size: 24px;
 }
 
-.balances {
+.menu-btn {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.menu-btn:active {
+  background: rgba(0, 136, 204, 0.1);
+}
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 20px;
+}
+
+/* ===== СЧЕТА ===== */
+
+.accounts-section {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.account-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 8px;
-  flex-shrink: 0;
-  width: 100%;
-}
-
-.balance-card {
-  background: var(--tg-theme-secondary-bg-color, #1f1f22);
-  border-radius: 16px;
-  padding: 10px 8px;
-  text-align: center;
+  padding: 16px 12px;
+  border-radius: 12px;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
   cursor: pointer;
-  min-width: 0; /* важно для обрезания текста */
+  transition: all 0.3s ease;
 }
 
-.balance-title {
+.account-card:active {
+  border-color: var(--primary-color);
+  transform: scale(0.98);
+}
+
+.account-icon {
+  font-size: 24px;
+}
+
+.account-label {
   font-size: 12px;
-  opacity: 0.8;
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--text-secondary);
+  text-align: center;
 }
 
-.balance-amount {
-  display: block;
-  margin-top: 6px;
-  font-size: 16px;
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.account-balance {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
 }
 
-.total {
-  background: var(--tg-theme-secondary-bg-color, #1f1f22);
-  border-radius: 16px;
-  padding: 12px;
+/* ===== ОБЩИЙ БАЛАНС ===== */
+
+.total-balance-section {
+  padding: 20px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary-color), rgba(0, 136, 204, 0.5));
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.total-balance-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 8px;
+}
+
+.total-balance-amount {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+/* ===== ДЕЙСТВИЯ ===== */
+
+.actions-section {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.action-btn {
+  flex: 1;
+}
+
+/* ===== ИСТОРИЯ ОПЕРАЦИЙ ===== */
+
+.history-section {
+  margin-bottom: 20px;
+}
+
+.history-section h2 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+}
+
+.operations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.operation-item {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-shrink: 0;
-  width: 100%;
-  box-sizing: border-box;
 }
 
-.total-label {
-  opacity: 0.8;
-  font-size: 14px;
+.operation-info {
+  flex: 1;
 }
 
-.total-amount {
-  font-size: 18px;
-  font-weight: 600;
+.operation-time {
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 
-.actions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-  width: 100%;
-  box-sizing: border-box;
+.operation-amount {
+  font-weight: bold;
+  text-align: right;
 }
+
+.operation-amount.expense {
+  color: var(--danger-color);
+}
+
+.operation-amount.income {
+  color: var(--success-color);
+}
+
+/* ===== КНОПКИ ===== */
 
 .primary-btn,
 .secondary-btn {
-  flex: 1;
-  height: 48px;
-  border-radius: 999px;
+  padding: 14px 16px;
   border: none;
+  border-radius: 8px;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.3s ease;
+  text-align: center;
+  display: block;
+  width: 100%;
 }
 
 .primary-btn {
-  background: var(--tg-theme-button-color, #2ea6ff);
-  color: var(--tg-theme-button-text-color, #ffffff);
+  background: var(--primary-color);
+  color: white;
 }
 
 .primary-btn:active {
   opacity: 0.8;
+  transform: scale(0.98);
 }
 
 .secondary-btn {
-  background: var(--tg-theme-secondary-bg-color, #1f1f22);
-  color: var(--tg-theme-text-color, #ffffff);
+  background: var(--surface-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
 }
 
 .secondary-btn:active {
-  opacity: 0.8;
+  border-color: var(--primary-color);
 }
 
-.history {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  width: 100%;
-  box-sizing: border-box;
-}
+/* ===== МОДАЛЬНЫЕ ОКНА ===== */
 
-.history h2 {
-  margin: 8px 0 12px;
-  font-size: 16px;
-  flex-shrink: 0;
-}
-
-#history-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-#history-list li {
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  font-size: 13px;
-  word-break: break-word;
-}
-
-/* Модалка */
 .modal {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
   display: flex;
   align-items: flex-end;
-  justify-content: center;
-  z-index: 1000;
-  padding: 16px;
-  box-sizing: border-box;
-  animation: slideUp 0.3s ease-out;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  animation: slideUp 0.3s ease;
 }
 
 .modal.hidden {
   display: none;
 }
 
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .modal-content {
+  position: relative;
+  z-index: 1001;
+  background: var(--surface-color);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  padding: 20px 16px;
+  padding-bottom: max(20px, var(--safe-area-inset-bottom, 0px));
   width: 100%;
-  max-width: 360px;
-  background: var(--tg-theme-secondary-bg-color, #1f1f22);
-  border-radius: 24px 24px 0 0;
-  padding: 24px 16px;
-  box-sizing: border-box;
-  animation: slideUp 0.3s ease-out;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
-.modal-content h3 {
-  margin: 0 0 16px;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.modal-content input {
-  width: 100%;
-  box-sizing: border-box;
-  height: 48px;
-  border-radius: 12px;
-  border: none;
-  padding: 0 14px;
-  font-size: 16px;
-  background: var(--tg-theme-bg-color, #0f0f10);
-  color: var(--tg-theme-text-color, #ffffff);
-  margin-bottom: 16px;
-}
-
-.modal-content input:focus {
-  outline: 2px solid var(--tg-theme-button-color, #2ea6ff);
-  outline-offset: -2px;
+.modal-content h2 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
 }
 
 .modal-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 0;
+  gap: 12px;
+  margin-top: 20px;
 }
 
-/* Скроллбар для истории */
-.history::-webkit-scrollbar {
-  width: 6px;
+.modal-actions button {
+  flex: 1;
 }
 
-.history::-webkit-scrollbar-track {
+/* ===== УТИЛИТЫ ===== */
+
+.hidden {
+  display: none !important;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 480px) {
+  .accounts-section {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ===== SCROLLBAR ===== */
+
+.app-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.app-content::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.history::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
+.app-content::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
 }
 
-
-
-.modal-content select {
-  width: 100%;
-  box-sizing: border-box;
-  height: 48px;
-  border-radius: 12px;
-  border: none;
-  padding: 0 16px;
-  font-size: 16px;
-  background: var(--tg-theme-bg-color, #f5f5f5);
-  color: var(--tg-theme-text-color, #ffffff);
-  margin-bottom: 16px;
-}
-
-.modal-content label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--tg-theme-text-color, #ffffff);
-}
-
-.modal-content div {
-  margin-bottom: 16px;
+.app-content::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
 }
