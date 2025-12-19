@@ -357,6 +357,7 @@ html, body {
   text-align: center;
   display: block;
   width: 100%;
+   user-select: none;
 }
 
 .primary-btn {
@@ -718,6 +719,7 @@ input[type="password"]:focus {
     font-size: 14px !important;
   }
 }
+
 
 
 
