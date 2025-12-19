@@ -1,7 +1,20 @@
 const tg = window.Telegram.WebApp;
 
 tg.ready();
+
+// Запрос safe area от Telegram
+if (tg.safeAreaInset) {
+  console.log('Safe Area:', {
+    top: tg.safeAreaInset.top,
+    bottom: tg.safeAreaInset.bottom,
+    left: tg.safeAreaInset.left,
+    right: tg.safeAreaInset.right
+  });
+}
+
 tg.expand();
+
+// остальной код...
 
 const balances = {
   card: 0,
@@ -92,3 +105,4 @@ document.getElementById("transfer-btn").addEventListener("click", () => {
 // инициализация
 loadBalances();
 renderBalances();
+
