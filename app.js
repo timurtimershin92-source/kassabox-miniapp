@@ -122,11 +122,62 @@ async function loadBalancesAndHistory() {
 }
 
 document.getElementById('expense-btn').addEventListener('click', () => {
-  tg.showAlert('Форма расхода в разработке');
+document.getElementById('expense-modal').classList.remove('hidden');
 });
 
+const confirmExpenseBtn = document.getElementById('confirm-expense-btn');
+confirmExpenseBtn.addEventListener('click', async () => {
+    const source = document.getElementById('expense-source').value;
+    const amount = parseFloat(document.getElementById('expense-amount').value);
+    const comment = document.getElementById('expense-comment').value;
+    if (!amount || amount <= 0) return tg.showAlert('Сумма должна быть больше 0');
+    try {
+          const res = await fetch(`${API_URL}/api/wallet/${currentWalletId}/expense`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'X-Init-Data': currentInitData },
+                  body: JSON.stringify({ source, amount, comment })
+                        });
+          if (res.ok) {
+                  document.getElementById('expense-modal').classList.add('hidden');
+                  document.getElementById('expense-amount').value = '';
+                  document.getElementById('expense-comment').value = '';
+                  loadBalancesAndHistory();
+                  tg.showAlert('Расход добавлен');
+                } else {
+                  tg.showAlert('Недостаточно средств');
+                }
+        } catch (e) {
+          tg.showAlert('Ошибка: ' + e.message);
+        }
+  });
+
 document.getElementById('transfer-btn').addEventListener('click', () => {
-  tg.showAlert('Форма инкассации в разработке');
+document.getElementById('transfer-modal').classList.remove('hidden');
+  });
+
+const confirmTransferBtn = document.getElementById('confirm-transfer-btn');
+confirmTransferBtn.addEventListener('click', async () => {
+    const transferType = document.getElementById('transfer-from').value;
+    const amount = parseFloat(document.getElementById('transfer-amount').value);
+    if (!amount || amount <= 0) return tg.showAlert('Сумма должна быть больше 0');
+    try {
+          const res = await fetch(`${API_URL}/api/wallet/${currentWalletId}/transfer`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'X-Init-Data': currentInitData },
+                  body: JSON.stringify({ type: transferType, amount })
+                });
+          if (res.ok) {
+                  document.getElementById('transfer-modal').classList.add('hidden');
+                  document.getElementById('transfer-amount').value = '';
+                  loadBalancesAndHistory();
+                  tg.showAlert('Инкассация выполнена');
+                } else {
+                  tg.showAlert('Недостаточно средств');
+                }
+                      } catch (e) {
+          tg.showAlert('Ошибка: ' + e.message);
+        }
+  });
 });
 
 // Проверка сохранённого кошелька
@@ -135,3 +186,4 @@ if (savedWalletId) {
   currentWalletId = savedWalletId;
   showMainScreen();
 }
+
