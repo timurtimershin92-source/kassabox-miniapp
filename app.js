@@ -1,3 +1,14 @@
+// Utility function to close modals
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.add('hidden');
+}
+
+// Utility function to open modals
+function openModal(modalId) {
+  document.getElementById(modalId).classList.remove('hidden');
+}
+
+
 const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
@@ -226,3 +237,4 @@ if (savedWalletId) {
   walletName = savedWalletName || 'Кошелёк';
   showMainScreen();
 }
+
