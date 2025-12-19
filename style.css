@@ -485,3 +485,25 @@ html, body {
 .app-content::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
 }
+
+/* FIX: Auth Form Display Issue */
+.auth-form {
+  display: none;
+  gap: 16px;
+}
+
+.auth-form.active {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.auth-tabs {
+  margin-bottom: 20px;
+}
+
